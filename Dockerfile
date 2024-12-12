@@ -1,12 +1,13 @@
-# Start with the official Node.js alpine image
-FROM node:22-alpine
-
+FROM alpine:3.21
 # Set build argument for Supabase version
 ARG SUPABASE_CLI_VERSION=latest
 
-# Install dependencies and Supabase CLI globally using npm
-RUN apk add --no-cache bash && \
-    npm install -g supabase@$SUPABASE_CLI_VERSION
+# Install dependencies and Supabase CLI
+RUN apk add --no-cache bash wget && \
+    VERSION=${SUPABASE_CLI_VERSION#v} && \
+    wget -O /supabase-cli.apk "https://github.com/supabase/cli/releases/download/${SUPABASE_CLI_VERSION}/supabase_${VERSION}_linux_amd64.apk" && \
+    apk add --allow-untrusted /supabase-cli.apk && \
+    rm /supabase-cli.apk
 
 # Set working directory
 WORKDIR /app
