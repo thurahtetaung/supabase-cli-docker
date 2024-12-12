@@ -1,7 +1,7 @@
 name: Check Supabase CLI Version
 on:
   schedule:
-    - cron: '0/5 * * * *' # Daily check
+    - cron: '0 0 * * *' # Daily at midnight
   workflow_dispatch: # Manual run
 
 
@@ -52,6 +52,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "Update to Supabase CLI version ${{ env.latest_release }}"
           branch: update-supabase-cli-${{ env.latest_release }}
+          base: main
           title: "Update to Supabase CLI version ${{ env.latest_release }}"
           body: |
             This pull request updates the Supabase CLI version to ${{ env.latest_release }}.
