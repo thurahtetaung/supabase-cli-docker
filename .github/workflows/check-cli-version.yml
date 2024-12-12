@@ -40,7 +40,6 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b update-supabase-cli-${{ env.latest_release }}
           git add version.txt
           git commit -m "Update to Supabase CLI version ${{ env.latest_release }}"
           git tag ${{ env.latest_release }}
