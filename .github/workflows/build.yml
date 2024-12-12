@@ -19,6 +19,8 @@ jobs:
           fi
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT }}
       - name: Extract version from version.txt
         id: get_version
         run: |
