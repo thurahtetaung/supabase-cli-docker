@@ -7,7 +7,7 @@ on:
 
 jobs:
   create-release:
-    name: Check Supabase CLI Releases
+    name: Create Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
