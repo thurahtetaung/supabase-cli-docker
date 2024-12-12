@@ -2,6 +2,9 @@ name: Check Supabase CLI Version
 on:
   schedule:
     - cron: '0/5 * * * *' # Daily check
+  workflow_dispatch: # Manual run
+
+
 jobs:
   check-supabase-release:
     name: Check Supabase CLI Releases
