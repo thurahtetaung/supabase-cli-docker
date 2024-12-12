@@ -39,6 +39,10 @@ jobs:
             ghcr.io/${{ github.repository }}:${{ env.version }}
           build-args: |
             SUPABASE_CLI_VERSION=${{ env.version }}
+      - name: Tag Latest Release
+        run: |
+          git tag -a ${{ env.version }} -m "Release ${{ env.version }}"
+          git push origin ${{ env.version }}
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
