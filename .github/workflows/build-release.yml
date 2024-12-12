@@ -38,7 +38,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:${{ env.version }}
+            ghcr.io/${{ github.repository }}:${{ env.version }}, ghcr.io/${{ github.repository }}:latest
           build-args: |
             SUPABASE_CLI_VERSION=${{ env.version }}
       - name: Tag Latest Release
