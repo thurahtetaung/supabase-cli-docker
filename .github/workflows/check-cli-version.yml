@@ -44,15 +44,14 @@ jobs:
           git add version.txt
           git commit -m "Update to Supabase CLI version ${{ env.latest_release }}"
           git tag ${{ env.latest_release }}
-          git push --set-upstream origin update-supabase-cli-${{ env.latest_release }} --tags
       - name: Create Update Pull Request
         if: ${{ env.update_needed == 'true' }}
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Update to Supabase CLI version ${{ env.latest_release }}"
-          branch: update-supabase-cli-${{ env.latest_release }}
+          branch: release/update-supabase-cli-${{ env.latest_release }}
           base: main
+          author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
           title: "Update to Supabase CLI version ${{ env.latest_release }}"
           body: |
             This pull request updates the Supabase CLI version to ${{ env.latest_release }}.
