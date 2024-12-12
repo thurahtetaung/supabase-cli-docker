@@ -20,6 +20,7 @@ jobs:
       - name: Get Latest Tag in Repo
         id: get_repo_tag
         run: |
+          git fetch --prune --unshallow
           git describe --tags --abbrev=0
           LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "none")
           echo "latest_tag=$LATEST_TAG" >> $GITHUB_ENV
