@@ -41,6 +41,8 @@ jobs:
             SUPABASE_CLI_VERSION=${{ env.version }}
       - name: Tag Latest Release
         run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git tag -a ${{ env.version }} -m "Release ${{ env.version }}"
           git push origin ${{ env.version }}
       - name: Create GitHub Release
