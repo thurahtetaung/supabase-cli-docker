@@ -1,7 +1,7 @@
 name: Check Supabase CLI Version
 on:
   schedule:
-    - cron: '0/5 * * * *' # Daily check
+    - cron: '0/2 * * * *' # Daily check
 jobs:
   check-supabase-release:
     name: Check Supabase CLI Releases
@@ -28,14 +28,28 @@ jobs:
           else
             echo "update_needed=false" >> $GITHUB_ENV
           fi
+      - name: Update Version File
+        if: ${{ env.update_needed == 'true' }}
+        run: |
+          echo "${{ env.latest_release }}" > version.txt
+      - name: Commit Changes
+        if: ${{ env.update_needed == 'true' }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b update-supabase-cli-${{ env.latest_release }}
+          git add version.txt
+          git commit -m "Update to Supabase CLI version ${{ env.latest_release }}"
+          git tag ${{ env.latest_release }}
+          git push --set-upstream origin update-supabase-cli-${{ env.latest_release }} --tags
       - name: Create Update Pull Request
         if: ${{ env.update_needed == 'true' }}
         uses: peter-evans/create-pull-request@v7
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "Update to Supabase CLI version ${{ env.latest_release }}"
           branch: update-supabase-cli-${{ env.latest_release }}
           title: "Update to Supabase CLI version ${{ env.latest_release }}"
           body: |
             This pull request updates the Supabase CLI version to ${{ env.latest_release }}.
           labels: update, automation
-          tags: true

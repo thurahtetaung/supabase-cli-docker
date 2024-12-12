@@ -19,14 +19,11 @@ jobs:
           fi
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Extract version from commit tag
+      - name: Extract version from version.txt
         id: get_version
         run: |
-          if [[ "${{ github.ref }}" =~ refs/tags/(.*) ]]; then
-            echo "version=${BASH_REMATCH[1]}" >> $GITHUB_ENV
-          else
-            echo "version=latest" >> $GITHUB_ENV
-          fi
+          VERSION=$(cat version.txt)
+          echo "version=$VERSION" >> $GITHUB_ENV
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
