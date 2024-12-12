@@ -1,0 +1,19 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  create-release:
+    name: Create GitHub Release
+    if: startsWith(github.ref, 'refs/tags/')
+    uses: softprops/action-gh-release@v2
+    with:
+      tag_name: ${{ github.ref_name }}
+      name: Release ${{ github.ref_name }}
+      body: |
+        This release contains the Docker image version ${{ github.ref_name }}.
+      draft: false
+      prerelease: false
