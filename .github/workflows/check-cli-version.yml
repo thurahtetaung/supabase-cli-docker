@@ -1,0 +1,41 @@
+name: Check Supabase CLI Version
+on:
+  schedule:
+    - cron: '0/5 * * * *' # Daily check
+jobs:
+  check-supabase-release:
+    name: Check Supabase CLI Releases
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Get Latest Supabase CLI Release
+        id: get_supabase_release
+        run: |
+          LATEST_RELEASE=$(curl -s https://api.github.com/repos/supabase/cli/releases/latest | jq -r .tag_name)
+          echo "latest_release=$LATEST_RELEASE" >> $GITHUB_ENV
+      - name: Get Latest Tag in Repo
+        id: get_repo_tag
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "none")
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_ENV
+      - name: Compare Versions
+        id: compare_versions
+        run: |
+          if [ "${{ env.latest_tag }}" = "none" ] || \
+              [ "${{ env.latest_release }}" != "${{ env.latest_tag }}" ]; then
+            echo "update_needed=true" >> $GITHUB_ENV
+          else
+            echo "update_needed=false" >> $GITHUB_ENV
+          fi
+      - name: Create Update Pull Request
+        if: ${{ env.update_needed == 'true' }}
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "Update to Supabase CLI version ${{ env.latest_release }}"
+          branch: update-supabase-cli-${{ env.latest_release }}
+          title: "Update to Supabase CLI version ${{ env.latest_release }}"
+          body: |
+            This pull request updates the Supabase CLI version to ${{ env.latest_release }}.
+          labels: update, automation
+          tags: true
