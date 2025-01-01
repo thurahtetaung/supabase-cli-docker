@@ -55,4 +55,6 @@ jobs:
           title: "Update to Supabase CLI version ${{ env.latest_release }}"
           body: |
             This pull request updates the Supabase CLI version to ${{ env.latest_release }}.
+          assignees: "thurahtetaung"
+          reviewers: "thurahtetaung"
           labels: update, automation
