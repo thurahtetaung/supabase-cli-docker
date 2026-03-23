@@ -5,18 +5,15 @@ on:
       - closed
     branches:
       - main
+    paths:
+      - 'Dockerfile'
+      - 'version.txt'
 jobs:
   build-and-push:
     name: Build and Push Docker Image
+    if: ${{ github.event.pull_request.merged == true }}
     runs-on: ubuntu-latest
     steps:
-      - name: Check if Pull Request is Merged
-        id: check_merged
-        run: |
-          if [ "${{ github.event.pull_request.merged }}" != "true" ]; then
-            echo "This workflow only runs on merged pull requests."
-            exit 1
-          fi
       - name: Checkout code
         uses: actions/checkout@v6
         # with:
