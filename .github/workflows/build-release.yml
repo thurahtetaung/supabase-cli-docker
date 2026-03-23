@@ -5,6 +5,8 @@ on:
       - closed
     branches:
       - main
+    paths-ignore:
+      - '.github/**'
 jobs:
   build-and-push:
     name: Build and Push Docker Image
