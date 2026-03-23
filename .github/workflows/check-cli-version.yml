@@ -46,7 +46,7 @@ jobs:
           git commit -m "Update to Supabase CLI version ${{ env.latest_release }}"
       - name: Create Update Pull Request
         if: ${{ env.update_needed == 'true' }}
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: release/update-supabase-cli-${{ env.latest_release }}
