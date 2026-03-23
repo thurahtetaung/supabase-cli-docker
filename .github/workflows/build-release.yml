@@ -5,48 +5,31 @@ on:
       - closed
     branches:
       - main
+    paths:
+      - 'Dockerfile'
+      - 'version.txt'
 jobs:
   build-and-push:
     name: Build and Push Docker Image
     if: ${{ github.event.pull_request.merged == true }}
     runs-on: ubuntu-latest
     steps:
-      - name: Check relevant file changes
-        id: changed_files
-        uses: actions/github-script@v8
-        with:
-          script: |
-            const files = await github.paginate(github.rest.pulls.listFiles, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.payload.pull_request.number,
-              per_page: 100
-            });
-            const shouldBuild = files.some((file) => ['Dockerfile', 'version.txt'].includes(file.filename));
-            core.setOutput('should_build', shouldBuild ? 'true' : 'false');
-            if (!shouldBuild) {
-              core.notice('Skipping image build: no Dockerfile/version.txt changes in merged PR.');
-            }
       - name: Checkout code
-        if: steps.changed_files.outputs.should_build == 'true'
         uses: actions/checkout@v6
         # with:
         #   token: ${{ secrets.PAT }}
       - name: Extract version from version.txt
-        if: steps.changed_files.outputs.should_build == 'true'
         id: get_version
         run: |
           VERSION=$(cat version.txt)
           echo "version=$VERSION" >> $GITHUB_ENV
       - name: Log in to GitHub Container Registry
-        if: steps.changed_files.outputs.should_build == 'true'
         uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and Push Docker Image
-        if: steps.changed_files.outputs.should_build == 'true'
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -56,7 +39,6 @@ jobs:
           build-args: |
             SUPABASE_CLI_VERSION=${{ env.version }}
       - name: Create Release
-        if: steps.changed_files.outputs.should_build == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.version }}
