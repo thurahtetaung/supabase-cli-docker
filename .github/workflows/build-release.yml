@@ -39,7 +39,7 @@ jobs:
           build-args: |
             SUPABASE_CLI_VERSION=${{ env.version }}
       - name: Create Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ env.version }}
           name: Release ${{ env.version }}
