@@ -45,6 +45,7 @@ jobs:
           git add version.txt
           git commit -m "Update to Supabase CLI version ${{ env.latest_release }}"
       - name: Create Update Pull Request
+        id: cpr
         if: ${{ env.update_needed == 'true' }}
         uses: peter-evans/create-pull-request@v8
         with:
@@ -58,3 +59,14 @@ jobs:
           assignees: "thurahtetaung"
           reviewers: "thurahtetaung"
           labels: update, automation
+      # Merged with the owner's PAT so the merge commit is authored by the owner
+      # and the merge triggers build-release.yml (GITHUB_TOKEN merges trigger no workflows).
+      - name: Merge Update Pull Request
+        if: ${{ steps.cpr.outputs.pull-request-number }}
+        env:
+          GH_TOKEN: ${{ secrets.PAT }}
+          PR_NUMBER: ${{ steps.cpr.outputs.pull-request-number }}
+        run: |
+          sleep 30
+          gh pr checks "$PR_NUMBER" --watch --fail-fast
+          gh pr merge "$PR_NUMBER" --merge
