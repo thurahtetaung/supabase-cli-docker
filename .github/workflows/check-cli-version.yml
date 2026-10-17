@@ -16,19 +16,21 @@ jobs:
         id: get_supabase_release
         run: |
           LATEST_RELEASE=$(curl -s https://api.github.com/repos/supabase/cli/releases/latest | jq -r .tag_name)
+          if [[ ! "$LATEST_RELEASE" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Unexpected latest release: '$LATEST_RELEASE'" >&2
+            exit 1
+          fi
           echo "latest_release=$LATEST_RELEASE" >> $GITHUB_ENV
-      - name: Get Latest Tag in Repo
-        id: get_repo_tag
+      - name: Get Current Version
+        id: get_current_version
         run: |
-          git fetch --prune --unshallow
-          git describe --tags --abbrev=0
-          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "none")
-          echo "latest_tag=$LATEST_TAG" >> $GITHUB_ENV
+          CURRENT_VERSION=$(cat version.txt 2>/dev/null || echo "none")
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_ENV
       - name: Compare Versions
         id: compare_versions
         run: |
-          if [ "${{ env.latest_tag }}" = "none" ] || \
-              [ "${{ env.latest_release }}" != "${{ env.latest_tag }}" ]; then
+          if [ "${{ env.current_version }}" = "none" ] || \
+              [ "${{ env.latest_release }}" != "${{ env.current_version }}" ]; then
             echo "update_needed=true" >> $GITHUB_ENV
           else
             echo "update_needed=false" >> $GITHUB_ENV
