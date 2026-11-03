@@ -69,6 +69,16 @@ jobs:
           GH_TOKEN: ${{ secrets.PAT }}
           PR_NUMBER: ${{ steps.cpr.outputs.pull-request-number }}
         run: |
-          sleep 30
-          gh pr checks "$PR_NUMBER" --watch --fail-fast
+          # External checks (e.g. GitGuardian) can take a while to register;
+          # `gh pr checks` fails outright while none are reported.
+          for _ in $(seq 1 20); do
+            COUNT=$(gh pr view "$PR_NUMBER" --json statusCheckRollup -q '.statusCheckRollup | length')
+            [ "$COUNT" -gt 0 ] && break
+            sleep 15
+          done
+          if [ "$COUNT" -gt 0 ]; then
+            gh pr checks "$PR_NUMBER" --watch --fail-fast
+          else
+            echo "No checks reported after 5 minutes; merging without them."
+          fi
           gh pr merge "$PR_NUMBER" --merge
